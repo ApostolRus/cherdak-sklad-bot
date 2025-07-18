@@ -1,0 +1,61 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+// --- конфигурация (заполните свои данные) ---
+const BOT_TOKEN = "7319209378:AAFp8STUYs4t0OSbD44YSc2-wgjnnwB7nS4";
+const SUPABASE_URL = "https://bxphpxevzggvqourimse.supabase.co";
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...."; // <-- ваш anon key
+// -------------------------------------------
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// утилита отправки сообщения в Telegram
+async function sendTg(chatId: number, text: string) {
+  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML" }),
+  });
+}
+
+serve(async (req) => {
+  // 1) Проверяем, что это POST-запрос от Telegram
+  if (req.method !== "POST") return new Response("ok");
+
+  const { message } = await req.json();
+  if (!message?.text) return new Response("ok");
+
+  // 2) Извлекаем EAN
+  let code = message.text.trim();
+  // убираем /start или другие команды
+  code = code.replace(/^\/\w+\s*/i, "").trim();
+
+  if (!/^\d{12,13}$/.test(code)) {
+    await sendTg(
+      message.chat.id,
+      "🔍 Отправьте 12- или 13-значный EAN-13 для поиска."
+    );
+    return new Response("ok");
+  }
+
+  // 3) Запрашиваем Supabase
+  const { data, error } = await supabase
+    .from("products")
+    .select("sku,name,location")
+    .eq("ean13", code)
+    .single();
+
+  if (error || !data) {
+    await sendTg(message.chat.id, "❌ Штрих-код не найден.");
+    return new Response("ok");
+  }
+
+  // 4) Формируем и отправляем карточку
+  const text = `📦 <b>${data.name}</b>\n\n` +
+               `🆔 Артикул: <code>${data.sku}</code>\n` +
+               `📍 Ячейка: <b>${data.location}</b>`;
+
+  await sendTg(message.chat.id, text);
+  return new Response("ok");
+});
