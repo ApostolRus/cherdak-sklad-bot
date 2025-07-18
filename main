@@ -5,7 +5,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const BOT_TOKEN = "7319209378:AAFp8STUYs4t0OSbD44YSc2-wgjnnwB7nS4";
 const SUPABASE_URL = "https://bxphpxevzggvqourimse.supabase.co";
 const SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4cGhweGV2emdndnFvdXJpbXNlIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTIzMzU5NiwiZXhwIjoyMDY0ODA5NTk2fQ.GvSYKXSe-CxQvNFnyBhTGWQQavPnxdZbF2BtmislEEI"; // <-- ваш anon key
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4cGhweGV2emdndnFvdXJpbXNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyMzM1OTYsImV4cCI6MjA2NDgwOTU5Nn0.Bf63Th3JUiV_2DWcSxF0wsVfpQj9tHLicQUIpraV1YM"; // <-- ваш anon key
 // -------------------------------------------
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
